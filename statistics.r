@@ -1,4 +1,4 @@
-# Benötigte Bibliotheken laden
+# Ben<U+00F6>tigte Bibliotheken laden
 library(dplyr)
 library(tidyr)
 library(wbstats)
@@ -17,21 +17,21 @@ indicators <- c(
 # Daten von der Weltbank abrufen
 data <- wb_data(indicators, start_date = 2000, end_date = 2019)
 
-# Berechnung der Gesamtjahre und des Schwellenwerts für die Datenqualität
+# Berechnung der Gesamtjahre und des Schwellenwerts f<U+00FC>r die Datenqualit<U+00E4>t
 total_years <- 2019 - 2000 + 1
 threshold <- ceiling(0.3 * total_years)
 
-# Identifizierung der Spalten, die Indikatoren repräsentieren
+# Identifizierung der Spalten, die Indikatoren repr<U+00E4>sentieren
 indicator_cols <- setdiff(names(data), c("country", "date", "iso2c", "iso3c"))
 
-# Zählen der nicht-NA Werte für jedes Land und jeden Indikator
+# Z<U+00E4>hlen der nicht-NA Werte f<U+00FC>r jedes Land und jeden Indikator
 grouped_data <- group_by(data, country)
 data_counts <- summarise(grouped_data, across(all_of(indicator_cols),
     function(x) sum(!is.na(x)),
     .names = "count_{.col}"
 ))
 
-# Identifizierung der Länder, die den Schwellenwert für alle Indikatoren erfüllen
+# Identifizierung der L<U+00E4>nder, die den Schwellenwert f<U+00FC>r alle Indikatoren erf<U+00FC>llen
 valid_countries_df <- filter(
     data_counts,
     if_all(
@@ -41,7 +41,7 @@ valid_countries_df <- filter(
 )
 valid_countries <- pull(valid_countries_df, country)
 
-# Filterung des ursprünglichen Datensatzes auf gültige Länder
+# Filterung des urspr<U+00FC>nglichen Datensatzes auf g<U+00FC>ltige L<U+00E4>nder
 data_filtered <- filter(data, country %in% valid_countries)
 
 # Funktion zur linearen Interpolation
@@ -56,7 +56,7 @@ data_filtered <- group_by(data_filtered, country)
 data_filtered <- arrange(data_filtered, date)
 data_interpolated <- mutate(data_filtered, across(all_of(indicator_cols), interpolate_linear))
 
-# Beispiel: Visualisierung für einen spezifischen Indikator in einem Land
+# Beispiel: Visualisierung f<U+00FC>r einen spezifischen Indikator in einem Land
 country_example <- "Armenia"
 indicator_example <- "SE.SEC.CUAT.PO.ZS"
 
@@ -67,6 +67,8 @@ data_before <- select(data_before, date, !!indicator_example)
 # Daten nach der Interpolation extrahieren
 data_after <- filter(data_interpolated, country == country_example)
 data_after <- select(data_after, date, !!indicator_example)
+
+title_before <- "Prozentsatz_Ausbildung_Armenien_25+_vor_Interpolation.png"
 
 # Grafik vor der Interpolation erstellen
 p_before <- ggplot(data_before, aes(x = date, y = !!sym(indicator_example))) +
@@ -79,7 +81,10 @@ p_before <- ggplot(data_before, aes(x = date, y = !!sym(indicator_example))) +
     )
 
 # Grafik speichern
-ggsave("GDP_per_capita_Germany3_before.png", plot = p_before)
+ggsave(title_before, plot = p_before)
+
+
+title_after <- "Prozentsatz_Ausbildung_Armenien_25+_nach_Interpolation.png"
 
 # Grafik nach der Interpolation erstellen
 p_after <- ggplot(data_after, aes(x = date, y = !!sym(indicator_example))) +
@@ -92,7 +97,7 @@ p_after <- ggplot(data_after, aes(x = date, y = !!sym(indicator_example))) +
     )
 
 # Grafik speichern und mit der vorherigen Grafik vergleichen
-ggsave("GDP_per_capita_Germany4_after.png", plot = p_after)
+ggsave(title_after, plot = p_after)
 
 # Daten bereinigen und Korrelationen berechnen
 data_clean <- data %>%
